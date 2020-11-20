@@ -1,0 +1,6 @@
+module Pods_ultravision {
+  umbrella header "Pods-ultravision-umbrella.h"
+
+  export *
+  module * { export * }
+}

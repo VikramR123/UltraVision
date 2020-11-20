@@ -1,0 +1,25 @@
+python3 -m pip install Pillow
+pip install numpy
+expo install expo-linear-gradient
+expo install react-native-ionicons
+expo install expo-av
+# Dependencies for tensorflow
+npm i expo-gl
+npm i @react-native-community/async-storage
+npm i @tensorflow/tfjs-layers
+npm i react-native-fs
+npm i expo-camera
+npm i jpeg-js
+
+npm install @tensorflow/tfjs
+npm install @tensorflow/tfjs-react-native
+npm install @tensorflow-models/mobilenet
+
+
+
+
+npm i react-native-image-crop-picker --save
+cd ios
+pod install
+
+
