@@ -1,7 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, TextInput, Button, View, Image, TouchableOpacity, Dimensions } from 'react-native';
+import { StyleSheet, Text, TextInput, Button, View, Image, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
 import { Video } from 'expo-av';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import ImagePicker from 'react-native-image-crop-picker';
 
@@ -15,8 +16,8 @@ import * as jpeg from 'jpeg-js';
 
 import HomeScreen from './screens/HomeScreen';
 
-// const height = Dimensions.get('window').height;
-// const width = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
+const screenWidth = Dimensions.get('window').width;
 
 
 
@@ -25,7 +26,9 @@ import HomeScreen from './screens/HomeScreen';
 
 export default function App() {
   const [status, setStatus] = useState(0); 
-  const [screen, setScreen] = useState("home"); // home, upload, success
+  const [screen, setScreen] = useState("home"); // home, upload, success, model
+
+  const [testOpac, setOpac] = useState(0);
 
   // useEffect(() => {
   //   const loadFonts = async () => {
@@ -128,10 +131,6 @@ export default function App() {
       
     </View>
     
-
-
-    
-
   </View>
 
   
@@ -143,17 +142,7 @@ export default function App() {
         <Text style={{color: 'white', fontSize: 24, fontWeight: 'bold', paddingLeft: 60}}>Your Data: </Text>
         <Text></Text>
         <Text style={{color: 'white', fontSize: 18, fontWeight: 'bold', alignSelf: 'center'}}>Ultrascan Scan: </Text>
-        {/* <Image style={styles.image} source={require('./assets/ultrasound.png')}/> */}
-        <Video
-          source={require('./assets/eye_vid.mp4')}
-          rate={1.0}
-          volume={0.0}
-          isMuted={false}
-          resizeMode="cover"
-          shouldPlay
-          isLooping
-          style={styles.image}
-        />
+        <Image style={styles.image} source={require('./assets/ultrasound.png')}/>
       </View>
 
       <View style={{flex: 1, alignItems: 'center'}}>
@@ -182,19 +171,99 @@ export default function App() {
   </View>
 
 
+  const analyzeScreen =
+  <View style={[styles.container, {backgroundColor: '#1ec4d5'}]}>
+    <LinearGradient
+    // Background Linear Gradient
+    colors={['rgba(36,192,156,0.8)', 'transparent']}
+    style={{
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        height: screenHeight,
+    }}
+    />
+
+    <TouchableOpacity style={{position: 'absolute', top: 5, left: 5}} onPress={() => {setScreen("home")}}>
+      <Text style={{fontSize: 16, color: 'white'}}> Home </Text>
+    </TouchableOpacity>
+
+    <View style={{alignItems: 'center', position: 'absolute', top: 10, height: screenHeight * 0.2}}>
+      <Text style={{fontSize: 56, color: 'white'}}> UltraVision </Text>
+      <Text style={{color: 'white', fontWeight: 'bold'}}> W A T C H I N G  Y O U R  B L I N D S I D E  </Text>
+    </View>
+
+    {/* <View style={{top: screenHeight*0.18, height: screenHeight*0.5, backgroundColor: 'red'}}> */}
+    <View style={{top: screenHeight*0.24, height: screenHeight*0.6, width: screenHeight*0.6}}>
+      <Video
+        source={require('./assets/eye_vid.mp4')}
+        onLoadStart={() => {setOpac(1)}}
+        onLoad={() => {setOpac(0)}}
+        rate={1.0}
+        volume={0.0}
+        isMuted={false}
+        resizeMode="cover"
+        shouldPlay
+        isLooping
+        style={{flex:1}}
+      />
+      <ActivityIndicator
+          animating
+          size="large"
+          color="pink"
+          style={{position: 'absolute',
+            top: screenHeight*0.25,
+            alignSelf: 'center',
+            opacity: testOpac
+          }}
+      />
+    </View>
+    {/* </View> */}
+
+    <TouchableOpacity style={{position: 'absolute', bottom: 5, left: 5}} onPress={() => {alert("Pop up with information")}}>
+    <Text style={{fontSize: 16, color: 'white'}}> Info </Text>
+    </TouchableOpacity>
+
+    <View style={{flexDirection: 'row', top: screenHeight*0.1, bottom: 0}}>
+      <TouchableOpacity style={styles.analyzeScreenButtons}>
+        <Text style={{fontSize: 24, color: '#A9A9A9'}}>Choose Another File</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.analyzeScreenButtons} onPress={() => {
+        //loading
+        setScreen("success");
+      }}>
+        <Text style={{fontSize: 24, color: '#A9A9A9'}}>Analyze</Text>
+      </TouchableOpacity>
+      {/* <TouchableOpacity style={{backgroundColor: 'black', borderRadius: 4, margin: 50}} onPress={() => {setStatus(0);}}> 
+        <Text style={{fontSize: 24, color: 'white'}}>Choose Another File</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={{backgroundColor: 'black', borderRadius: 4, margin: 50}} onPress={() => {setStatus(0);}}> 
+        <Text style={{fontSize: 24, color: 'white'}}>Analyze</Text>
+      </TouchableOpacity> */}
+    </View>
+
+    <StatusBar style="auto" />
+  </View>
+
+
 
   {
     if (screen === "home") {
-      return <HomeScreen setSuccess = {() => setScreen("success")} setUpload = {() => setScreen("upload")} />
+      return <HomeScreen setSuccess = {() => setScreen("model")} setUpload = {() => setScreen("upload")} />
+    }
+    else if (screen == "model") {
+      return uploadScreen;
     }
     else if (screen == "success") {
       return successScreen;
     }
     else if (screen == "upload") {
-      return uploadScreen;
+      //return uploadScreen;
+      return analyzeScreen;
     }
     else {
-      return <HomeScreen setSuccess = {() => setScreen("success")} setUpload = {() => setScreen("upload")} />
+      return <HomeScreen setSuccess = {() => setScreen("model")} setUpload = {() => setScreen("upload")} />
     }
   }
 }
@@ -217,6 +286,16 @@ const styles = StyleSheet.create({
     alignItems: 'center', 
     backgroundColor: 'rgba(0,0,0,0.7)', 
     height: "40%",//height * 0.4, 
+    width: "30%",//width * 0.3, 
+    top: 10, 
+    margin: 50,
+    borderRadius: 10
+  },
+  analyzeScreenButtons: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.8)', 
+    height: "25%",//height * 0.4, 
     width: "30%",//width * 0.3, 
     top: 10, 
     margin: 50,
